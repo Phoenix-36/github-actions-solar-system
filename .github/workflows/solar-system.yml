@@ -60,4 +60,4 @@ jobs:
               with:
                 name: Code-Coverage-Result
                 path: coverage
-                retentions-days: 5
+                retention-days: 5
