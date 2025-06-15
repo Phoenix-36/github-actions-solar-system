@@ -44,9 +44,9 @@ jobs:
             path: test-results.xml
 
     code-coverage:
-        name: code-coverage
-        runs-on: ubuntu-latest
-        steps:
+          name: code-coverage
+          runs-on: ubuntu-latest
+          steps:
             - name: Checkout
               uses: actions/checkout@v4
 
@@ -69,46 +69,47 @@ jobs:
                 path: coverage
                 retention-days: 5
     
-    # docker:
-    #   name: Containerization
-    #   needs: [unit-testing,code-coverage]
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - name: checkout
-    #       uses: actions/checkout@v4
+    docker:
+      name: docker
+      needs: [unit-testing,code-coverage]
+      runs-on: ubuntu-latest
+      steps:
+        - name: checkout
+          uses: actions/checkout@v4
           
-    #     - name: docker login
-    #       uses: docker/login-action@v3
-    #       with:
-    #         username: ${{ vars.DOCKERHUB_USERNAME }}
-    #         password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        - name: docker login
+          uses: docker/login-action@v3
+          with:
+            registry: ghcr.io
+            username: ${{ github.repository_owner }}
+            password: ${{ secrets.GITHUB_TOKEN }}
         
-    #     - name: docker image building
-    #       uses: docker/build-push-action@v4
-    #       with:
-    #         context: .
-    #         push: false
-    #         tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{github.sha}}
+        - name: docker image building
+          uses: docker/build-push-action@v4
+          with:
+            context: .
+            push: true
+            tag: ghcr.io/${{ github.repository_owner }}/solar-system:${{github.sha}}
 
-    #     - name: docker build for testing
-    #       run: |
-    #         docker image list
-    #         docker run -itd --name solar-system-app \
-    #         -p 3000:3000 \
-    #         -e MONGO_URI=$MONGO_URI \
-    #         -e MONGO_USERNAME=$MONGO_USERNAME \
-    #         -e MONGO_PASSWORD=$MONGO_PASSWORD \
-    #         ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{github.sha}}
+        # - name: docker build for testing
+        #   run: |
+        #     docker image list
+        #     docker run -itd --name solar-system-app \
+        #     -p 3000:3000 \
+        #     -e MONGO_URI=$MONGO_URI \
+        #     -e MONGO_USERNAME=$MONGO_USERNAME \
+        #     -e MONGO_PASSWORD=$MONGO_PASSWORD \
+            # ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{github.sha}}
 
-    #         export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-    #         echo $IP
+        #     export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+        #     echo $IP
 
-    #         echo "Testing image URL using WGET"
-    #         wget -q -O -127.0.0.1:3000 |grep -i live
+        #     echo "Testing image URL using WGET"
+        #     wget -q -O -127.0.0.1:3000 |grep -i live
 
-    #     - name: docker push
-    #       uses: docker/build-push-action@v4
-    #       with:
-    #         context: .
-    #         push: true
-    #         tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{github.sha}}
+        # - name: docker push
+        #   uses: docker/build-push-action@v4
+        #   with:
+        #     context: .
+        #     push: true
+        #     tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{github.sha}}
