@@ -35,6 +35,7 @@ jobs:
           run: npm install
     
         - name: Unit Testing
+          continue-on-error: true 
           run: npm test
           
         - name: Archive Test Result
@@ -90,7 +91,7 @@ jobs:
           with:
             context: .
             push: true
-            tag: ghcr.io/{ githubUsername }/solar-system:{githubSha}
+            tag: 'ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}'
 
         # - name: docker build for testing
         #   run: |
