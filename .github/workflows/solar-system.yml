@@ -95,8 +95,18 @@ jobs:
             context: .
             push: true
             tags: 'ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}'
-
-
+    
+    dev-deploy:
+      name: Developement
+      runs-on: ubuntu-latest
+        echo "Running dev-Deploy"
+    # dev-deploy job
+    integration-test:
+      needs: dev-deploy
+      uses: ./.github/workflows/reusable-workflow.yml
+      with:
+        ingress-url: ${{ needs.dev-deploy.outputs.APP_INGRESS_URL }}
+# next job
         # - name: docker build for testing
         #   run: |
         #     docker image list
